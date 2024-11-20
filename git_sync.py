@@ -4,12 +4,16 @@ from bs4 import BeautifulSoup
 import zipfile
 import io
 import json
+import subprocess
 
-def download_overleaf_project():
-    config_file = Path(Path(__file__).parent.resolve(),'config.json')
-    with open(config_file, 'r') as f:
-        config = json.load(f)
+def run_command(command, cwd=None):
+    """Run a shell command and handle errors."""
+    try:
+        subprocess.run(command, cwd=cwd, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
 
+def download_overleaf_project(config):
     login_url = f"{config['overleaf_url']}/login"
     project_url = f"{config['overleaf_url']}/project"
 
@@ -59,7 +63,17 @@ def download_overleaf_project():
             print(f"Failed to download project. Status code: {response.status_code}")
 
 if __name__ == "__main__":
-    download_overleaf_project()
+    print('Loading config')
+    config_file = Path(Path(__file__).parent.resolve(),'myconfig.json')
+    with open(config_file, 'r') as f:
+        config = json.load(f)
+    print('Syncing git')
+    run_command(["git", "pull"], cwd=config['repo_path'])
+    download_overleaf_project(config)
+    run_command(["git", "add", "."], cwd=config['repo_path'])
+    run_command(["git", "commit", "-m", "Syncing overleaf projects"], cwd=config['repo_path'])
+    run_command(["git", "push"], cwd=config['repo_path'])
+
 
 
 
