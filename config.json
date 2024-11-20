@@ -1,0 +1,9 @@
+{
+    "overleaf_url": "youroverleafdomain.com",
+    "username": "yourusername",
+    "password": "yourpassword",
+    "repo_path": "path-to-your-local-git-repository",
+    "projects": {
+        "your-overleaf-project-name": "your-overleaf-project-id"
+    }
+}
